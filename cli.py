@@ -265,19 +265,37 @@ def cmd_verify(args):
         print("✅ 待复核队列为空")
         return 0
     llm = _make_llm(cfg, verbose=args.verbose)
-    total = 0
+    results, all_conf = [], []
     for it in items:
         n = it["chapter"]
-        fname = next((f for nn, f, _ in engine.list_chapters(book) if nn == n), None)
-        if not fname:
+        found = next(((f, t) for nn, f, t in engine.list_chapters(book) if nn == n), None)
+        if not found:
             print(f"⚠️  找不到第 {n} 章文件，跳过")
             continue
+        fname, t = found
         text = engine.read_text(os.path.join(book["_chapter_dir"], fname))
-        title = engine.chapter_title(n, next(t for nn, f, t in engine.list_chapters(book) if nn == n))
+        title = engine.chapter_title(n, t)
         conf = engine.run_l3(book, text, title, it["problems"], llm, cfg, verbose=args.verbose)
+        errs = [c for c in conf if "error" in c]
+        conf = [c for c in conf if "error" not in c]
         print(f"  {title}: {len(it['problems'])} 条疑似 → 确认 {len(conf)} 条")
-        total += len(conf)
-    print(f"\n✅ 复核完成，确认 {total} 条问题")
+        for e in errs:
+            print(f"    ⚠️  {e['error']}")
+        results.append({"chapter": n, "file": fname, "title": title,
+                        "fixes": [], "l1": [], "confirmed": conf,
+                        "l2_count": len(it["problems"])})
+        if conf:
+            all_conf.append({"book": book["name"], "chapter": n, "title": title, "issues": conf})
+
+    if not results:
+        print("⚠️  没有可复核的章节")
+        return 1
+    paths = _paths(cfg)
+    rep = engine.write_report(paths["report_file"], book, results)
+    _save_json(paths["confirmed_file"], all_conf)
+    total = sum(len(r["confirmed"]) for r in results)
+    print(f"\n📄 报告：{rep}")
+    print(f"✅ 复核完成，确认 {total} 条问题")
     return 0
 
 

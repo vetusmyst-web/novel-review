@@ -233,6 +233,29 @@ def _parse_json_arr(raw):
         return None
 
 
+def _normalize_problems(d):
+    """把 AI 返回的 problems 字段规整成 list[dict]，剔除脏元素。
+
+    AI 常见格式错误：返回字符串、返回 dict、列表里混入字符串/None。
+    """
+    if not isinstance(d, dict):
+        return []
+    raw = d.get("problems", [])
+    if isinstance(raw, dict):
+        raw = [raw]
+    if not isinstance(raw, list):
+        return []
+    out = []
+    for p in raw:
+        if not isinstance(p, dict):
+            continue
+        sev = p.get("severity")
+        if sev not in ("高", "中", "低"):
+            p["severity"] = "中"
+        out.append(p)
+    return out
+
+
 def run_l2(book, fname, text, n, title, llm, rule_names, verbose=False):
     problems = []
     setup = setup_text(book)
@@ -251,14 +274,17 @@ def run_l2(book, fname, text, n, title, llm, rule_names, verbose=False):
             raw = llm.chat(prompt, max_tokens=rule["max_tokens"],
                            temperature=rule["temperature"],
                            tag=f"{book['name']}_{n:03d}_{rn}")
-            d = _parse_json_obj(raw) or {}
-            for p in d.get("problems", []):
+            d = _parse_json_obj(raw)
+            found = _normalize_problems(d)
+            kept = 0
+            for p in found:
                 if p.get("severity") not in rule["keep_severity"]:
                     continue
                 p["rule"] = rule["name"]
                 problems.append(p)
+                kept += 1
             if verbose:
-                print(f"      L2[{rule['name']}] → {len(d.get('problems', []))} 条原始")
+                print(f"      L2[{rule['name']}] → 原始 {len(found)} 条，保留 {kept} 条")
         except Exception as e:
             problems.append({"type": "扫描失败", "rule": rule["name"],
                              "desc": str(e), "severity": "中", "suggestion": ""})
@@ -286,9 +312,13 @@ def run_l3(book, text, title, problems, llm, cfg, verbose=False):
         return [{"error": "L3 输出无法解析为 JSON 数组"}]
     confirmed = []
     for v in arr:
-        if not v.get("confirmed"):
+        if not isinstance(v, dict):
+            continue
+        if v.get("confirmed") is not True and v.get("confirmed") != "true":
             continue
         i = v.get("index")
+        if isinstance(i, str) and i.isdigit():
+            i = int(i)
         if isinstance(i, int) and 0 <= i < len(problems):
             orig = dict(problems[i])
             orig["l3_reason"] = v.get("reason", "")

@@ -18,7 +18,6 @@ import sys
 import json
 import shutil
 import argparse
-import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -266,7 +265,6 @@ def cmd_verify(args):
         print("✅ 待复核队列为空")
         return 0
     llm = _make_llm(cfg, verbose=args.verbose)
-    pat = book.get("chapter_file_pattern", r"^第(\d+)章[-\.\s]*(.*)\.md$")
     total = 0
     for it in items:
         n = it["chapter"]

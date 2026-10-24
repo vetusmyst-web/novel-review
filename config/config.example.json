@@ -1,0 +1,49 @@
+{
+  "_说明": "全局配置。复制本文件为 config.json 后修改。config.json 已被 .gitignore 排除，不会提交。",
+
+  "default_backend": "doubao",
+  "fallback_backend": "deepseek",
+  "request_timeout": 300,
+  "manual_dir": "output/manual",
+
+  "backends": {
+    "doubao": {
+      "enabled": true,
+      "base_url": "https://ark.cn-beijing.volces.com/api/v3",
+      "model": "请填入你的推理接入点ID或模型名",
+      "api_key_env": "DOUBAO_API_KEY"
+    },
+    "deepseek": {
+      "enabled": true,
+      "base_url": "https://api.deepseek.com/v1",
+      "model": "deepseek-chat",
+      "api_key_env": "DEEPSEEK_API_KEY"
+    },
+    "ollama": {
+      "enabled": false,
+      "base_url": "http://127.0.0.1:11434/v1",
+      "model": "qwen2.5:7b",
+      "api_key_env": "OLLAMA_API_KEY"
+    }
+  },
+
+  "l1": {
+    "backup_before_fix": true,
+    "backup_dir": "output/backup",
+    "enabled_linters": ["punct", "paragraph", "wordcount", "duplicate"]
+  },
+
+  "l3": {
+    "enabled": true,
+    "system": "你是极其严格的小说终审编辑，以吹毛求疵著称，专门二次确认问题是否存在：拒绝冤枉原文，也绝不放过真错。",
+    "redline_types": ["文风叛变", "感情越界", "设定矛盾", "世界观矛盾", "人物矛盾"],
+    "instruct": "你是小说终审编辑。主扫描编辑器报告了以下疑似问题。请核对【本章正文】与【本书设定】，逐条判定「确实存在问题」还是「误报」。\n\n判定尺度：\n- 红线类（{redline_types}）：从严确认。只要有显著越线迹象就判 true。\n- 非红线类（细节、承接、节奏、重复、标点）：宁缺毋滥。确有问题=铁证如山（原文确实自相矛盾、设定确实写错）。有疑虑判 false。\n\n【本书设定】\n{setup}\n\n【本章正文（片段）】\n{text_excerpt}\n\n【疑似问题清单】\n{problems_json}\n\n只输出一个 JSON 数组，不要其他文字：\n[{\"index\": 0, \"confirmed\": true, \"reason\": \"复核依据（引用原文或设定）\", \"suggestion\": \"若确认，建议改法\"}]"
+  },
+
+  "output": {
+    "report_file": "output/report.md",
+    "queue_file": "state/queue.json",
+    "confirmed_file": "state/confirmed.json",
+    "progress_file": "state/progress.json"
+  }
+}

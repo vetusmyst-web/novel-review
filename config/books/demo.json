@@ -1,0 +1,22 @@
+{
+  "_说明": "示例书（假数据），用于验证系统跑通。可直接删除。",
+  "name": "demo",
+  "genre": "都市悬疑·短章快节奏",
+  "enabled": true,
+
+  "chapter_file_pattern": "^第(\\d+)章[-\\s]*(.*)\\.md$",
+  "chapter_dir": "demo/章节",
+
+  "setup_files": {
+    "人物": "demo/设定/人物.md"
+  },
+
+  "min_chars": 1200,
+  "paragraph_max": 100,
+  "duplicate_limit": 8,
+
+  "rules": ["style", "consistency", "continuity", "pacing"],
+
+  "baseline": "",
+  "time_baseline": ""
+}

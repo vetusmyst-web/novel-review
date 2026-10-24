@@ -1,0 +1,24 @@
+{
+  "_说明": "一本书一份配置。路径相对于项目根目录。复制本文件到 config/books/<书名>.json 后修改。",
+
+  "name": "书名（必须与文件名一致）",
+  "genre": "题材定位，如：校园慢热、修仙爽文、都市悬疑",
+  "enabled": true,
+
+  "chapter_file_pattern": "^第(\\d+)章[-\\.\\s]*(.*)\\.md$",
+  "chapter_dir": "books/书名/章节",
+
+  "setup_files": {
+    "人物": "books/书名/设定/人物.md",
+    "世界观": "books/书名/设定/世界观.md"
+  },
+
+  "min_chars": 4500,
+  "paragraph_max": 100,
+  "duplicate_limit": 6,
+
+  "rules": ["style", "consistency", "continuity", "pacing"],
+
+  "baseline": "",
+  "time_baseline": ""
+}

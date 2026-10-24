@@ -1,0 +1,40 @@
+# 忽略规则 —— 这些文件绝不提交到 GitHub
+
+# 个人配置与密钥
+config/config.json
+.env
+.env.*
+*.key
+*.pem
+
+# 审查产物
+output/*
+!output/.gitkeep
+state/*
+!state/.gitkeep
+output/manual/
+output/backup/
+
+# L1 自动修复前的备份
+*.md.bak
+*.bak
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*~
+
+# 你自己的书（若把真实书目录放在项目内）
+# 注意：config/books/ 是配置目录，不受此规则影响
+/books/
+!/books/.gitkeep

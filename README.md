@@ -18,7 +18,7 @@
 ## 五分钟跑起来
 
 ```bash
-git clone <本仓库地址> novel-review
+git clone https://github.com/vetusmyst-web/novel-review.git
 cd novel-review
 
 # 1. 建配置
@@ -52,6 +52,23 @@ DOUBAO_API_KEY=xxxxx
 python3 cli.py review --book demo --n 1 --manual
 # prompt 会导出到 output/manual/*.md
 ```
+
+手动模式的完整流程（不需要任何 API key）：
+
+1. 上一步每条规则会导出一份 prompt，文件名形如 `demo_001_style.md`，
+   里面分成【系统提示】和【用户提示】两段。
+2. 打开其中一份，**把两个代码块里的内容一起贴给 AI**（豆包网页版、DeepSeek 网页版、
+   ChatGPT 都行）。
+3. AI 会回一个 JSON，形如：
+   ```json
+   {"problems": [{"type":"标点","position":"第3段","desc":"用了半角逗号","severity":"低","suggestion":"改成全角"}]}
+   ```
+4. 拿到 JSON 后，**人工筛一遍**：把确认要改的条目自己改到正文里。
+   字数不足、节奏这类需要判断的问题，AI 只给建议，改不改由你定。
+
+> 说明：目前 manual 模式只做到「导出 prompt」这一步，AI 的回复需要你自己看、自己改，
+> 不会自动回灌进报告。想要全自动（AI 结果直接写进 `output/report.md` 并做 L3 复核），
+> 需要在 `.env` 里配一个 API key。DeepSeek 每章约几分钱，是成本最低的选择。
 
 ---
 

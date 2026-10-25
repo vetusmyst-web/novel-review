@@ -85,7 +85,10 @@ def cmd_doctor(args):
         print(f"    {name:10s} model={b.get('model','?'):28s} {env:20s} {flag}")
     if not any_key:
         print("    ⚠️  没有任何可用密钥 —— L1 仍可运行，L2/L3 需要密钥")
-        print("    在项目根创建 .env，写入：DOUBAO_API_KEY=你的key")
+        print("    在项目根创建 .env，写入：DEEPSEEK_API_KEY=sk-你的key")
+        print("    （豆包/火山方舟是可选的，不配也能用 DeepSeek 或 --manual 手动模式）")
+    else:
+        print("    提示：后端只要有一个 ✅ 就能跑 L2/L3；标 ❌ 的没配 key，不影响使用。")
 
     print("\n[4] 规则文件：")
     rules = sorted(p.stem for p in (engine.RULES_DIR).glob("*.md") if not p.name.startswith("_"))
